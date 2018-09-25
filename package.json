@@ -1,0 +1,69 @@
+{
+  "name": "RengNews",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest",
+    "setup": "yarn && cd ./ios && pod install",
+    "flow start": "flow start",
+    "flow stop": "flow stop",
+    "flow status": "flow status",
+    "flow coverage": "flow coverage",
+    "run-ios": "react-native run-ios",
+    "run-android": "react-native run-android",
+    "export-apk": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && cd ./android && ./gradlew assembleDebug",
+    "install-apk": "cd ./android/app/build/outputs/apk/debug && adb install app-debug.apk"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "html-entities": "^1.2.1",
+    "lodash": "^4.17.10",
+    "moment": "^2.22.2",
+    "prop-types": "^15.6.2",
+    "react": "16.3.1",
+    "react-native": "0.55.4",
+    "react-native-code-push": "^5.4.0",
+    "react-native-fbsdk": "^0.7.0",
+    "react-native-google-signin": "^1.0.0-rc3",
+    "react-native-htmlview": "^0.13.0",
+    "react-native-keyboard-aware-scroll-view": "^0.6.0",
+    "react-native-linear-gradient": "react-native-community/react-native-linear-gradient",
+    "react-native-progress": "^3.5.0",
+    "react-native-render-html": "^3.10.0",
+    "react-native-rss-parser": "^1.2.0",
+    "react-native-size-matters": "^0.1.2",
+    "react-native-tab-view": "^1.0.2",
+    "react-native-slider": "^0.11.0",
+    "react-native-vector-icons": "^4.6.0",
+    "react-native-video": "^3.2.0",
+    "react-native-video-controls": "https://github.com/hoanghaihuy/react-native-video-controls#master",
+    "react-native-view-overflow": "0.0.3",
+    "react-native-xml2js": "^1.0.3",
+    "react-navigation": "^2.9.1",
+    "react-redux": "^5.0.7",
+    "redux": "^4.0.0",
+    "redux-thunk": "^2.3.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.3",
+    "babel-jest": "22.4.3",
+    "babel-preset-react-native": "4.0.0",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.8.2",
+    "eslint-plugin-react-native": "^3.2.1",
+    "jest": "22.4.3",
+    "react-test-renderer": "16.3.1"
+  },
+  "jest": {
+    "preset": "react-native"
+  },
+  "rnpm": {
+    "assets": [
+      "./assets/fonts"
+    ]
+  }
+}

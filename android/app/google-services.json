@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "647738972414",
+    "firebase_url": "https://vntimes-213403.firebaseio.com",
+    "project_id": "vntimes-213403",
+    "storage_bucket": "vntimes-213403.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:647738972414:android:d93e5897be3454bd",
+        "android_client_info": {
+          "package_name": "com.buith.rengnews"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "647738972414-jbg3bn97dagdh8ilr01ei6vhn8sb1em8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.buith.rengnews",
+            "certificate_hash": "ded7281d029d6eb97ada69d0f6209d77b673c00f"
+          }
+        },
+        {
+          "client_id": "647738972414-705hp89sjf5l2apjomdk112jh0kftgec.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxD4JoU1RQFEZ8z5KNfr76cHvVC-hu-jk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "647738972414-705hp89sjf5l2apjomdk112jh0kftgec.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "647738972414-kns87c6cmhgutuab0rnrq4e8o8vfg3f4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.vntimes"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
