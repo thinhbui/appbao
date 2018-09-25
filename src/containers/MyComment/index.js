@@ -55,7 +55,7 @@ class MyComment extends PureComponent {
       <View style={{ flex: 1 }}>
         <FlatList
           data={data}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={item => item.id}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.commentContainer}
@@ -79,7 +79,11 @@ class MyComment extends PureComponent {
                       <Text
                         numberOfLines={2}
                         ellipsizeMode="tail"
-                        style={{ fontFamily: Fonts.regular,fontSize: 14 * d.ratioW, color: 'rgba(0,0,0,0.7)' }}
+                        style={{
+                          fontFamily: Fonts.regular,
+                          fontSize: 14 * d.ratioW,
+                          color: 'rgba(0,0,0,0.7)',
+                        }}
                       >
                         {item.post.title ||
                           'Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.'}

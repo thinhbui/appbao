@@ -15,7 +15,7 @@ const styles = ScaledSheet.create({
   },
   image: {
     width: d.windowSize.width * 0.3,
-    height: d.windowSize.width * 0.22,
+    height: d.windowSize.width * 0.23,
     borderRadius: 3 * d.ratioW,
     paddingRight: 10 * d.ratioW,
     marginVertical: d.windowSize.height * 0.015,

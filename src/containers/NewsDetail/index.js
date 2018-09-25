@@ -129,28 +129,37 @@ class NewsDetail extends Component {
 
   onComment = async () => {
     const { news } = this.state;
+    const { id, full_name, avatar } = this.props.user.data;
     if (Object.keys(this.props.user.data).length !== 0) {
       const cmt = await comment(news.id, this._textInput._lastNativeText);
-      const commentRes = await getComment(this.item.id);
-      // console.log('comment', cmt);
-
+      // const commentRes = await getComment(this.item.id);
+      const cmtObject = {
+        ...cmt.data,
+        comment_like: [],
+        user: {
+          id,
+          full_name,
+          avatar,
+        },
+        user_id: id,
+      };
       if (cmt.data) {
         if (Platform.OS === 'android') {
           ToastAndroid.show('Bình luận thành công', ToastAndroid.SHORT);
         }
         this.setState({
-          comment: commentRes.data.data.filter(item => item.parent_id === null),
+          comment: [cmtObject, ...this.state.comment],
           content: '',
+          write: false,
         });
         this.props.user.data.point = this.props.user.data.point + cmt.data.point_increase;
         this.props.saveUserData(this.props.user.data);
-      } else {
+      } else if (Platform.OS === 'android') {
         ToastAndroid.show('Bình luận thất bại', ToastAndroid.SHORT);
       }
-      this.setState({ write: false, news }, () => {
-        this._textInput.clear();
-        console.log('this.state.comment', this.state.comment);
-      });
+      // this.setState({ write: false }, () => {
+      //   this._textInput.clear();
+      // });
       Keyboard.dismiss();
     } else {
       this.onOpenModal();
@@ -327,7 +336,7 @@ class NewsDetail extends Component {
       fontContent,
       hotNews,
     } = this.state;
-    console.log(news);
+    console.log(comment);
 
     const titleStyles = {
       p: [
@@ -516,9 +525,7 @@ class NewsDetail extends Component {
                   <View style={styles.suggestionContainer}>
                     <View style={styles.customLineStyle} />
                     <View style={{ backgroundColor: '#fff', position: 'absolute' }}>
-                      <Text style={{ fontFamily: Fonts.regular, margin: 5 }}>
-                        Bình luận
-                      </Text>
+                      <Text style={{ fontFamily: Fonts.regular, margin: 5 }}>Bình luận</Text>
                     </View>
                   </View>
                   {comment.length === 0 && (
@@ -533,7 +540,6 @@ class NewsDetail extends Component {
                       this.commentLayout = e.nativeEvent.layout.y;
                     }}
                     data={comment}
-                    extraData={this.state}
                     renderItem={({ item }) => (
                       <Comment
                         block
@@ -544,7 +550,7 @@ class NewsDetail extends Component {
                         onDelete={this.onDeleteComment}
                       />
                     )}
-                    keyExtractor={(item, index) => index.toString()}
+                    keyExtractor={item => item.id.toString()}
                     style={{ marginBottom: 15 * d.ratioH }}
                   />
                 </ScrollView>

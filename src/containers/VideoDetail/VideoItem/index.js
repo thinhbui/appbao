@@ -1,10 +1,13 @@
 import React, { PureComponent } from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import Icons from 'react-native-vector-icons/SimpleLineIcons';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import moment from 'moment';
 import VideoPlayer from 'react-native-video-controls';
 import * as d from '../../../utilities/transform';
 import styles from './styles';
-import { Fonts } from '../../../constants';
 
 const HEIGHT = (d.windowSize.width - d.windowSize.width * 0.06) * 0.75;
 
@@ -13,12 +16,28 @@ class VideoItem extends PureComponent {
     super(props);
     this.state = {
       init: false,
-      refresh: true,
     };
   }
+
+  getTime = (item) => {
+    const createdAt = item.created_at;
+    const now = moment().format('YYYY-MM-DD HH:mm:ss');
+    const duration = moment(now, 'YYYY-MM-DD HH:mm:ss').diff(createdAt, 'seconds');
+    const minute = 3600;
+    const hour = 86400;
+    if (duration < 60) {
+      return ` • ${moment(now, 'YYYY-MM-DD HH:mm:ss').diff(createdAt, 'seconds')} giây`;
+    } else if (duration < minute) {
+      return ` • ${moment(now, 'YYYY-MM-DD HH:mm:ss').diff(createdAt, 'minutes')} phút`;
+    } else if (duration > minute && duration < hour) {
+      return ` • ${moment(now, 'YYYY-MM-DD HH:mm:ss').diff(createdAt, 'hours')} giờ`;
+    }
+    return ` • ${moment(now, 'YYYY-MM-DD HH:mm:ss').diff(createdAt, 'days')} ngày`;
+  };
+
   render() {
     const { item, isFocus } = this.props;
-    const { init, refresh } = this.state;
+    const { init } = this.state;
     return (
       <View style={{ height: d.windowSize.height * 0.6 }}>
         {!isFocus && (
@@ -39,7 +58,7 @@ class VideoItem extends PureComponent {
             <VideoPlayer
               onLayout={() => this.setState({ init: true })}
               source={{
-                uri: item.snippet.url,
+                uri: item.youtube,
               }}
               ref={(player) => {
                 this.player = player;
@@ -58,39 +77,48 @@ class VideoItem extends PureComponent {
         ) : (
           <Image
             source={{
-              uri: item.snippet.thumbnails.high.url,
+              uri: item.image || 'https://picsum.photos/200/200',
             }}
-            style={{
-              width: '100%',
-              height: HEIGHT,
-            }}
+            style={styles.thumbnailStyle}
           />
         )}
-        <Text style={{ fontFamily: Fonts.regular, color: '#fff', fontSize: 16 }}>
-          {item.snippet.title}
-        </Text>
-        <View>
-          <Text style={{ color: '#fff' }}>{item.channelTitle}</Text>
-        </View>
         <View style={styles.infoContainer}>
-          <Text style={{ fontFamily: Fonts.regular, fontSize: 11 * d.ratioW, color: '#BDBDBD' }}>
-            {item.snippet.channelTitle}
+          <Text style={styles.titleStyle} numberOfLines={3} ellipsizeMode="tail">
+            {item.title}
           </Text>
-          <View style={{ flexDirection: 'row' }}>
-            <Text style={styles.commentText}>{item.statistics.commentCount}</Text>
-            <Icon
-              name="message-square"
-              size={15 * d.ratioW}
-              color="#BDBDBD"
-              style={{ marginLeft: 5 * d.ratioW }}
-            />
-            <Icon
-              name="share-2"
-              size={15 * d.ratioW}
-              color="#BDBDBD"
-              style={{ marginLeft: 25 * d.ratioW }}
-            />
-          </View>
+          <Text style={styles.frameStyle}>
+            {item.crawl_frame ? item.crawl_frame.name : ''}
+            {this.getTime(item)}
+          </Text>
+          <TouchableOpacity
+            style={styles.commentWrapper}
+            activeOpacity={1}
+            onPress={() => this.props.navigation.navigate('CommentVideo', { item })}
+          >
+            <View style={styles.commentPartContainer}>
+              <Image source={{ uri: this.props.user.data.avatar }} style={styles.avatarStyle} />
+              <Text style={styles.commentTextStyle}>Nhập bình luận...</Text>
+            </View>
+            <View style={styles.commentPartContainer}>
+              <View style={styles.commentContainer1}>
+                {item.comment.length > 0 && (
+                  <View style={styles.commentQuantity}>
+                    <Text style={styles.cmt}>{item.comment.length}</Text>
+                  </View>
+                )}
+                <Icons name="bubble" size={18} color="#BDBDBD" />
+              </View>
+              <View style={styles.commentContainer}>
+                <Icons
+                  name="share-alt"
+                  size={18}
+                  color="#BDBDBD"
+                  style={{ bottom: 1 * d.ratioH, marginRight: 5 * d.ratioW }}
+                />
+                <Text style={styles.itemText}>Chia sẻ</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
         </View>
         {!isFocus && (
           <View
@@ -106,4 +134,22 @@ class VideoItem extends PureComponent {
     );
   }
 }
-export default VideoItem;
+
+VideoItem.propTypes = {
+  user: PropTypes.object.isRequired,
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func,
+  }).isRequired,
+  onEnd: PropTypes.func.isRequired,
+  isFocus: PropTypes.bool.isRequired,
+  item: PropTypes.object.isRequired,
+};
+
+const mapStateToProps = state => ({
+  user: state.saveUserReducers,
+});
+
+export default connect(
+  mapStateToProps,
+  null,
+)(VideoItem);

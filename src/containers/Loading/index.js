@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { View, AsyncStorage, Alert, Platform } from 'react-native';
+import { View, AsyncStorage, Alert, Platform, Dimensions } from 'react-native';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import axios from 'axios';
@@ -24,6 +24,7 @@ const refreshTokenExpireDuration = 2592000;
 class Loading extends PureComponent {
   componentDidMount() {
     console.log('componentDidMount', this.props);
+    console.log(Dimensions.get('window'));
     // AsyncStorage.removeItem('token');
     // if (Platform.OS === 'android') {
     // this.onCheckUser();

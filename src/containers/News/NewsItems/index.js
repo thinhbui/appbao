@@ -44,7 +44,10 @@ class NewsItems extends Component {
             }}
           >
             <View style={styles.imageContainer}>
-              <Image source={{ uri: item.image }} style={styles.image} />
+              <Image
+                source={{ uri: item.image || 'https://picsum.photos/200/200' }}
+                style={styles.image}
+              />
             </View>
             <View>
               <Text
@@ -82,21 +85,19 @@ class NewsItems extends Component {
                         fontSize: 12 * d.ratioW,
                       }}
                     >
-                      {item.crawl_frame && item.crawl_frame.name}
+                      {item.crawl_frame !== null ? item.crawl_frame.name : ''}
                       {this.getTime()}
                       {this.onRenderCommentQuantity()}
                     </Text>
                   </View>
-                  <TouchableOpacity onPress={this.props.onReport}>
-                    <Icon
-                      name="x-square"
-                      size={12 * d.ratioW}
-                      color="#BDBDBD"
-                      style={{ margin: 5 }}
-                    />
-                  </TouchableOpacity>
                 </View>
               )}
+              <TouchableOpacity
+                onPress={this.props.onReport}
+                style={{ position: 'absolute', alignSelf: 'flex-end', bottom: 12 * d.ratioH }}
+              >
+                <Icon name="x-square" size={12 * d.ratioW} color="#BDBDBD" style={{ margin: 5 }} />
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -118,9 +119,13 @@ class NewsItems extends Component {
           <View style={[styles.footer]}>
             <View style={{ flex: 1 }}>
               <Text
-                style={{ fontFamily: Fonts.regular, color: '#BDBDBD', fontSize: 12 * d.ratioW }}
+                style={{
+                  fontFamily: Fonts.regular,
+                  color: '#BDBDBD',
+                  fontSize: 12 * d.ratioW,
+                }}
               >
-                {item.crawl_frame && item.crawl_frame.name}
+                {item.crawl_frame !== null ? item.crawl_frame.name : ''}
                 {this.getTime()}
                 {this.onRenderCommentQuantity()}
               </Text>
@@ -137,16 +142,12 @@ class NewsItems extends Component {
   onRenderCommentQuantity = () => {
     if (this.props.item.postComment && this.props.item.postComment !== 0) {
       return (
-        // <View style={{ flexDirection: 'row' }}>
+        // <View style={{ flexDirection: 'row', marginBottom: -3 * d.ratioH }}>
         <Text style={{ fontFamily: Fonts.regular, fontSize: 12 * d.ratioW, color: '#BDBDBD' }}>
           {' • '}
           {this.props.item.postComment}
-          <Icon
-            name="message-square"
-            size={12 * d.ratioW}
-            color="#BDBDBD"
-            style={{ marginLeft: 5 * d.ratioW }}
-          />
+          {'  '}
+          <Icon name="message-square" size={12 * d.ratioW} color="#BDBDBD" />
         </Text>
         // </View>
       );

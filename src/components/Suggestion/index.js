@@ -33,12 +33,7 @@ const onRenderCommentQuantity = (item) => {
       <Text style={{ fontSize: 12 * d.ratioW, color: '#BDBDBD', fontFamily: Fonts.regular }}>
         {' • '}
         {item.postComment}
-        <Icon
-          name="message-square"
-          size={12 * d.ratioW}
-          color="#BDBDBD"
-          style={{ marginLeft: 5 * d.ratioW }}
-        />
+        <Icon name="message-square" size={12 * d.ratioW} color="#BDBDBD" />
       </Text>
       // </View>
     );
@@ -51,7 +46,7 @@ const Suggestion = ({
 }) =>
   (item ? (
     <TouchableOpacity style={styles.container} onPress={onPress}>
-      <Image source={{ uri: item.image }} style={styles.image} />
+      <Image source={{ uri: item.image || 'https://picsum.photos/200/200' }} style={styles.image} />
       <View>
         <Text
           style={[styles.title, { fontSize: titleFontSize }]}
@@ -69,10 +64,17 @@ const Suggestion = ({
               {onRenderCommentQuantity(item)}
             </Text>
           </View>
-          <TouchableOpacity>
-            <Icon name="x-square" size={12 * d.ratioW} color="#BDBDBD" style={{ margin: 5 }} />
-          </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            alignSelf: 'flex-start',
+            bottom: 8 * d.ratioH,
+            right: 15 * d.ratioW,
+          }}
+        >
+          <Icon name="x-square" size={12 * d.ratioW} color="#BDBDBD" style={{ margin: 5 }} />
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   ) : null);

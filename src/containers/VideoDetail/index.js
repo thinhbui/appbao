@@ -18,7 +18,9 @@ class VideoDetail extends PureComponent {
       refresh: true,
     };
   }
-  componentDidMount() {}
+  componentDidMount() {
+    console.log(this.item);
+  }
 
   onGoBack = () => {
     this.props.navigation.goBack();
@@ -29,6 +31,7 @@ class VideoDetail extends PureComponent {
       // <View>
       <VideoItem
         item={item}
+        navigation={this.props.navigation}
         isFocus={id === index}
         onEnd={debounce(() => {
           this.flatList.scrollToIndex({
@@ -61,16 +64,16 @@ class VideoDetail extends PureComponent {
             this.flatList = ref;
           }}
           style={{ backgroundColor: '#000' }}
-          data={videoData.items}
+          data={this.item}
           extraData={this.state}
           renderItem={this.renderItem}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={item => item.id}
           onScrollEndDrag={(e) => {
             const { contentOffset } = e.nativeEvent;
             this.setState({
               id:
-                Math.round(contentOffset.y / HEIGHT) >= videoData.items.length - 1
-                  ? videoData.items.length - 1
+                Math.round(contentOffset.y / HEIGHT) >= this.item.length - 1
+                  ? this.item.length - 1
                   : Math.round(contentOffset.y / HEIGHT),
             });
           }}

@@ -252,7 +252,7 @@ class CommentDetail extends Component {
                     navigation={this.props.navigation}
                   />
                 )}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={item => item.id}
                 showsHorizontalScrollIndicator={false}
               />
             </View>

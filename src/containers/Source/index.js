@@ -192,7 +192,7 @@ class Source extends PureComponent {
               onReport={() => this.onOpenModalReport(item.title, item.image, item.id)}
             />
           )}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={item => item.id}
           refreshing={this.state.refreshing}
           refreshControl={
             <RefreshControl

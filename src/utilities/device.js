@@ -10,5 +10,9 @@ const isIphoneX = () => {
   );
 };
 
-// eslint-disable-next-line
-export { isIphoneX };
+const isGalaxy = () => {
+  const dimen = Dimensions.get('window');
+  return Platform.OS === 'android' && (dimen.height === 692 || dimen.width === 692);
+};
+
+export { isIphoneX, isGalaxy };

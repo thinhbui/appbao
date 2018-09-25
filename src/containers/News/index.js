@@ -16,14 +16,9 @@ import { debounce } from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Feather';
+import moment from 'moment';
 import NewsItems from './NewsItems';
-import {
-  getNewsByCategory,
-  getAds,
-  reportPost,
-  getFrame,
-  getVideos,
-} from '../../services/newsAPI';
+import { getNewsByCategory, getAds, reportPost, getFrame, getVideos } from '../../services/newsAPI';
 import videoData from './videoData';
 import * as d from '../../utilities/transform';
 import ModalReport from './ModalReport';
@@ -132,7 +127,7 @@ class News extends PureComponent {
                 onReport={() => this.onOpenModalReport(item.title, item.image, item.id)}
               />
             )}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={item => item.id}
             refreshing={this.state.refreshing}
             refreshControl={
               <RefreshControl
@@ -216,9 +211,9 @@ class News extends PureComponent {
       if (this.props.item.id === 11) {
         const result = await getVideos(page);
         console.log(result);
-        
-        // if (result.status === 200) this.setState({ data: result.data, refreshing: false });
-        this.setState({ data: videoData.items, refreshing: false, done: true });
+
+        if (result.status === 200) this.setState({ data: result.data.data, refreshing: false });
+        // this.setState({ data: videoData.items, refreshing: false, done: true });
         // else this.setState({ refreshing: false, done: true });
       } else {
         this.random = this.getRandomInt(4) + 6;
@@ -248,6 +243,23 @@ class News extends PureComponent {
       }
     }
   };
+
+  getTime = (item) => {
+    const createdAt = item.created_at;
+    const now = moment().format('YYYY-MM-DD HH:mm:ss');
+    const duration = moment(now, 'YYYY-MM-DD HH:mm:ss').diff(createdAt, 'seconds');
+    const minute = 3600;
+    const hour = 86400;
+    if (duration < 60) {
+      return ` • ${moment(now, 'YYYY-MM-DD HH:mm:ss').diff(createdAt, 'seconds')} giây`;
+    } else if (duration < minute) {
+      return ` • ${moment(now, 'YYYY-MM-DD HH:mm:ss').diff(createdAt, 'minutes')} phút`;
+    } else if (duration > minute && duration < hour) {
+      return ` • ${moment(now, 'YYYY-MM-DD HH:mm:ss').diff(createdAt, 'hours')} giờ`;
+    }
+    return ` • ${moment(now, 'YYYY-MM-DD HH:mm:ss').diff(createdAt, 'days')} ngày`;
+  };
+
   loadMoreNewsFollow = async (id) => {
     const { page, refreshing, data } = this.state;
     if (!refreshing && this.onEndReachedCalledDuringMomentum) {
@@ -296,7 +308,7 @@ class News extends PureComponent {
   };
 
   renderItem = ({ item, index }) => {
-    if (!item.kind) {
+    if (!item.youtube) {
       return (
         <View>
           <NewsItems
@@ -313,33 +325,26 @@ class News extends PureComponent {
       <TouchableOpacity
         style={styles.videoContainer}
         activeOpacity={1}
-        onPress={() => this.props.navigation.navigate('VideoDetail', { item })}
+        onPress={() => this.props.navigation.navigate('VideoDetail', { item: this.state.data })}
       >
         <View>
           <Image
             source={{
-              uri: item.snippet.thumbnails.high.url,
+              uri: item.image || 'https://picsum.photos/200/200',
             }}
             style={styles.imageVideo}
           />
           <Icon name="play" size={35 * d.ratioW} color="#FFF" style={styles.playButton} />
         </View>
-        <Text style={styles.titleSnippet}>{item.snippet.title}</Text>
+        <Text style={styles.titleSnippet}>{item.title}</Text>
         <View style={styles.infoContainer}>
-    
           <Text style={{ fontFamily: Fonts.regular, fontSize: 11 * d.ratioW, color: '#BDBDBD' }}>
-            {item.snippet.channelTitle}
+            {item.crawl_frame ? item.crawl_frame.name : ''}
+            {this.getTime(item)}
           </Text>
           <View style={{ flexDirection: 'row' }}>
-            <Text style={styles.commentText}>{item.statistics.commentCount}</Text>
             <Icon
               name="message-square"
-              size={15 * d.ratioW}
-              color="#BDBDBD"
-              style={{ marginLeft: 5 * d.ratioW }}
-            />
-            <Icon
-              name="share-2"
               size={15 * d.ratioW}
               color="#BDBDBD"
               style={{ marginLeft: 25 * d.ratioW }}

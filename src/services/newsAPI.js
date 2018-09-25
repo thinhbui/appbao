@@ -148,10 +148,10 @@ const getNewsByCategory = async (category_id, page, user_report) => {
   }
 };
 
-const getVideos = async (page) => {
+const getVideos = async () => {
   try {
-    console.log(page);
-    return await lightService.get(`/v1/post/client/video?page_size=15?page=${page}`);
+    // console.log(page);
+    return await lightService.get(`/v1/post/client/video?page_size=15`);
   } catch (error) {
     console.log('getVideos', error);
     return null;

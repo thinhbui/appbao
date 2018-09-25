@@ -125,7 +125,7 @@ class History extends PureComponent {
               data={data}
               extraData={this.state}
               renderItem={this.renderItem}
-              keyExtractor={(item, index) => index.toString()}
+              keyExtractor={item => item.id}
               refreshing={refreshing}
               refreshControl={
                 <RefreshControl

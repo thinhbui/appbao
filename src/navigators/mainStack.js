@@ -18,6 +18,7 @@ import Wallet from '../containers/Wallet';
 import Lotery from '../containers/Lotery';
 import TabViewExample from '../containers/NewsTab';
 import Source from '../containers/Source';
+import CommentVideo from '../containers/VideoDetail/VideoItem/CommentVideo';
 
 export default createStackNavigator(
   {
@@ -40,6 +41,7 @@ export default createStackNavigator(
     Lotery,
     TabViewExample,
     Source,
+    CommentVideo,
   },
   {
     initialRouteName: 'TabViewExample',

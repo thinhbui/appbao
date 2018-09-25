@@ -73,7 +73,7 @@ class Setting extends PureComponent {
             style={styles.buttonContainer}
             onPress={() => navigation.navigate('AccountSetting')}
           >
-            <Text style={styles.buttonNameStyle}>Sửa đổi thông tin</Text>
+            <Text style={styles.buttonNameStyle}>Cập nhật tài khoản</Text>
           </TouchableOpacity>
         </View>
       );
@@ -107,21 +107,6 @@ class Setting extends PureComponent {
         <ScrollView>
           <View style={styles.container}>
             {this.renderUserInfo()}
-            <TouchableOpacity style={styles.buttonContainer}>
-              <Text style={styles.buttonNameStyle}>Tôi cần trợ giúp</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainer}>
-              <Text style={styles.buttonNameStyle}>Kích thước chữ</Text>
-              <Text style={styles.buttonDescriptionStyle}>Vừa</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainer}>
-              <Text style={styles.buttonNameStyle}>Dữ liệu di động</Text>
-              <Text style={styles.buttonDescriptionStyle}>Tiết kiệm dung lượng</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainer}>
-              <Text style={styles.buttonNameStyle}>Xoá dữ liệu tạm lưu</Text>
-              <Text style={styles.buttonDescriptionStyle}>3.21 MB</Text>
-            </TouchableOpacity>
             <View style={styles.buttonContainer}>
               <Text style={styles.buttonNameStyle}>Phiên bản</Text>
               <Text style={styles.buttonDescriptionStyle}>1.0</Text>

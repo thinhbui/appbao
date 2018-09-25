@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import { ScaledSheet } from 'react-native-size-matters';
-import { isIphoneX } from '../../utilities/device';
+import { isGalaxy } from '../../utilities/device';
 import * as d from '../../utilities/transform';
 import { Fonts } from '../../constants';
 
@@ -18,7 +18,7 @@ const styles = ScaledSheet.create({
     alignItems: 'center',
     paddingTop:
       /* eslint-disable */
-      Platform.OS === 'ios' ? d.statusBarHeight : 13 * d.ratioH,
+      Platform.OS === 'ios' ? d.statusBarHeight : isGalaxy() ? 5 * d.ratioH : 13 * d.ratioH,
     /* eslint-enable */
     // paddingHorizontal: 15 * d.ratioW,
   },
@@ -41,6 +41,7 @@ const styles = ScaledSheet.create({
     alignItems: 'flex-end',
     // width: '50@s',
     height: '100%',
+    justifyContent: 'center',
     marginRight: 15 * d.ratioW,
   },
 });

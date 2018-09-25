@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { View, Text, TouchableOpacity, Image, Alert, ToastAndroid } from 'react-native';
+import { View, Text, TouchableOpacity, Image, Alert, ToastAndroid, Platform } from 'react-native';
 import IconSimple from 'react-native-vector-icons/SimpleLineIcons';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -11,12 +11,18 @@ import { Fonts } from '../../constants';
 
 class Comment extends PureComponent {
   state = {
-    isLiked:
-      this.comment && this.props.user
-        ? this.comment.comment_like.findIndex(item => item.id === this.props.user.data.id) !== -1
-        : false,
+    isLiked: false,
     commentLike: (this.props.comment.comment_like && this.props.comment.comment_like.length) || '',
   };
+  componentDidMount() {
+    if (this.props.comment && this.props.user && this.props.comment.comment_like) {
+      this.setState({
+        isLiked:
+          this.props.comment.comment_like.findIndex(item => item.id === this.props.user.data.id) !==
+          -1,
+      });
+    }
+  }
   onCheckCommentDetail = () => {
     this.props.navigation.navigate('CommentDetail', { item: this.props.comment });
   };
@@ -26,8 +32,8 @@ class Comment extends PureComponent {
 
     if (result.status === 200 && result.data) {
       this.setState({ isLiked: true, commentLike: this.state.commentLike + 1 });
-      ToastAndroid.show('Đã thích', ToastAndroid.SHORT);
-    } else {
+      if (Platform.OS === 'android') ToastAndroid.show('Đã thích', ToastAndroid.SHORT);
+    } else if (Platform.OS === 'android') {
       ToastAndroid.show('Không thành công!', ToastAndroid.SHORT);
     }
   };
@@ -70,8 +76,11 @@ class Comment extends PureComponent {
   render() {
     const { isLiked, commentLike } = this.state;
     const {
-      comment, canDelete, block, sub, mainFontSize, otherFontSize,
+      comment, canDelete, block, sub, mainFontSize, otherFontSize, isLike,
     } = this.props;
+    console.log(this.comment && this.props.user
+      ? this.comment.comment_like.findIndex(item => item.id === this.props.user.data.id) !== -1
+      : false);
 
     return (
       <TouchableOpacity
@@ -97,7 +106,9 @@ class Comment extends PureComponent {
               }}
             >
               {comment.content}
-              <Text style={{ fontSize: otherFontSize, color: '#BDBDBD', fontFamily: Fonts.regular }}>
+              <Text
+                style={{ fontSize: otherFontSize, color: '#BDBDBD', fontFamily: Fonts.regular }}
+              >
                 {' • '}
                 {(comment.user && comment.user.full_name) || 'Chim sẻ đi nắng'}
                 {' • '}
@@ -118,8 +129,8 @@ class Comment extends PureComponent {
                     color: isLiked ? '#C21E2B' : '#BDBDBD',
                     fontSize: otherFontSize,
                     marginRight: 5 * d.ratioW,
-                fontFamily: Fonts.regular,
-              }}
+                    fontFamily: Fonts.regular,
+                  }}
                 >
                   Thích
                 </Text>
@@ -127,7 +138,7 @@ class Comment extends PureComponent {
                   name="heart"
                   size={otherFontSize}
                   color={isLiked ? '#C21E2B' : '#BDBDBD'}
-                  style={{ marginTop: 3 * d.ratioH }}
+                  style={{ marginTop: 2 * d.ratioH }}
                 />
                 <Text
                   style={{
@@ -144,10 +155,10 @@ class Comment extends PureComponent {
                   <Text
                     style={{
                       color: '#3881f7',
-                      marginHorizontal: sub ? null : 5 * d.ratioW,
+                      marginHorizontal: 5 * d.ratioW,
                       fontSize: otherFontSize,
-                fontFamily: Fonts.regular,
-              }}
+                      fontFamily: Fonts.regular,
+                    }}
                   >
                     Xóa
                   </Text>

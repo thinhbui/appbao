@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 import { ScaledSheet } from 'react-native-size-matters';
 import * as d from '../../utilities/transform';
 import { Fonts } from '../../constants';
+import { isGalaxy } from '../../utilities/device';
 
 const styles = ScaledSheet.create({
   scrollview: {
@@ -46,7 +47,7 @@ const styles = ScaledSheet.create({
     alignItems: 'center',
   },
   footerContainer: {
-    height: 50 * d.ratioH,
+    height: isGalaxy() ? 40 * d.ratioH : 50 * d.ratioH,
     width: '100%',
     flexDirection: 'row',
     backgroundColor: '#fff',
@@ -76,17 +77,17 @@ const styles = ScaledSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     height: 50 * d.ratioH,
-    paddingHorizontal: 10 * d.ratioW,
+    marginRight: 20 * d.ratioW,
   },
   commentQuantity: {
     position: 'absolute',
     // width: 10 * d.ratioW,
-    height: 10 * d.ratioW,
+    height: 12 * d.ratioW,
     paddingHorizontal: 3 * d.ratioW,
     borderRadius: 8 * d.ratioW,
     backgroundColor: '#C21E2B',
     top: 12 * d.ratioH,
-    right: d.ratioW * 5,
+    left: d.ratioW * 8,
     zIndex: 100,
     elevation: 100,
     justifyContent: 'center',
@@ -94,7 +95,7 @@ const styles = ScaledSheet.create({
   },
   cmt: {
     color: '#fff',
-    fontSize: 6 * d.ratioW,
+    fontSize: 9 * d.ratioW,
     fontFamily: Fonts.regular,
   },
   itemText: {

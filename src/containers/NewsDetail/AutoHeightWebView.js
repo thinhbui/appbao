@@ -53,7 +53,27 @@ class AutoHeightWebView extends Component {
         }
         p{
             text-align: justify;
-            font-size: ${fontSize}px;
+            font-size: ${fontSize}px!important;
+            font-family: ${Fonts.regular};
+        }
+        a{
+            text-align: justify;
+            font-size: ${fontSize}px!important;
+            font-family: ${Fonts.regular};
+        }
+        strong{
+            text-align: justify;
+            font-size: ${fontSize}px!important;
+            font-family: ${Fonts.regular};
+        }
+        figcaption{
+            text-align: justify;
+            font-size: ${fontSize}px!important;
+            font-family: ${Fonts.regular};
+        }
+        td{
+            text-align: justify;
+            font-size: ${fontSize}px!important;
             font-family: ${Fonts.regular};
         }
         body, html, #height-calculator {
