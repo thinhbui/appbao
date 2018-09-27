@@ -10,9 +10,9 @@ import {
   Animated,
   FlatList,
   Keyboard,
-  ActivityIndicator,
   ToastAndroid,
   Alert,
+  // PanResponder
 } from 'react-native';
 import { ShareDialog } from 'react-native-fbsdk';
 import moment from 'moment';
@@ -39,6 +39,7 @@ import {
   follow,
   getFollow,
   getHotNews,
+  // getContentNews,
 } from '../../services/newsAPI';
 import AutoHeightWebView from './AutoHeightWebView';
 import Suggestion from '../../components/Suggestion';
@@ -64,14 +65,51 @@ class NewsDetail extends Component {
       content: '',
       fontContent: this.props.fontSizeRedux.data,
       hotNews: [],
+      newsContent: '',
     };
-    console.log(props.user);
+    this.animatedIsPress = new Animated.Value(0);
+    // this._panResponder = PanResponder.create({
+    //   // Ask to be the responder:
+    //   onStartShouldSetPanResponder: (evt, gestureState) => true,
+    //   onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+    //   onMoveShouldSetPanResponder: (evt, gestureState) => true,
+    //   onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+
+    //   onPanResponderGrant: (evt, gestureState) => {
+    //     // The gesture has started. Show visual feedback so the user knows
+    //     // what is happening!
+    //     // gestureState.d{x,y} will be set to zero now
+    //   },
+    //   onPanResponderMove: (evt, gestureState) => {
+    //     // The most recent move distance is gestureState.move{X,Y}
+    //     // The accumulated gesture distance since becoming responder is
+    //     // gestureState.d{x,y}
+    //   },
+    //   onPanResponderTerminationRequest: (evt, gestureState) => true,
+    //   onPanResponderRelease: (evt, gestureState) => {
+    //     // The user has released all touches while this view is the
+    //     // responder. This typically means a gesture has succeeded
+    //   },
+    //   onPanResponderTerminate: (evt, gestureState) => {
+    //     // Another component has become the responder, so this gesture
+    //     // should be cancelled
+    //   },
+    //   onShouldBlockNativeResponder: (evt, gestureState) =>
+    //     // Returns whether this component should block native components from becoming the JS
+    //     // responder. Returns true by default. Is currently only supported on android.
+    //     true
+    //   ,
+    // });
+  }
+  UNSAFE_componentWillMount() {
+    // getContentNews(this.item.id).then((res) => {
+    //   console.log('getContentNews', res);
+    //   this.setState({ newsContent: res.data.content });
+    // });
   }
   componentDidMount() {
     this.getNewDetail();
     this.getHotNews();
-    this.animatedIsPress = new Animated.Value(0);
-    console.log(this.props.fontSizeRedux, 16 * d.ratioW);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -165,6 +203,7 @@ class NewsDetail extends Component {
       this.onOpenModal();
     }
   };
+
   onLike = () => {
     const { news } = this.state;
     if (Object.keys(this.props.user.data).length !== 0) {
@@ -189,6 +228,7 @@ class NewsDetail extends Component {
     const { navigation } = this.props;
     navigation.goBack();
   };
+
   onDeleteComment = (id) => {
     const { comment } = this.state;
 
@@ -196,13 +236,15 @@ class NewsDetail extends Component {
     if (index !== -1) comment.splice(index, 1);
     this.setState({ comment });
   };
+
   onSuggestPress = (item) => {
     this.props.navigation.goBack();
     this.props.navigation.navigate('NewsDetail', { item });
   };
-  onFollow = async (id) => {
+
+  onFollow = async () => {
     if (Object.keys(this.props.user.data).length !== 0) {
-      const result = await follow(id);
+      const result = await follow(this.item.crawl_frame.id);
       if (result.status === 200) {
         this.setState({ follow: !this.state.follow });
       }
@@ -210,36 +252,33 @@ class NewsDetail extends Component {
       this.onOpenModal();
     }
   };
+
   getNewDetail = async () => {
-    const res = await getNewsDetail(this.item.id, this.props.user.data.id || '');
-    const commentRes = await getComment(this.item.id);
-    if (res.status === 200 && commentRes.status === 200) {
-      this.setState(
-        {
+    getComment(this.item.id).then((res) => {
+      if (res.status === 200) {
+        this.setState({
+          comment: res.data.data.filter(item => item.parent_id === null),
+        });
+      }
+    });
+    getNewsDetail(this.item.id, this.props.user.data.id || '').then((res) => {
+      if (res.status === 200) {
+        this.setState({
           news: res.data,
-          comment: commentRes.data.data.filter(item => item.parent_id === null),
           loading: false,
-        },
-        () => {
-          this.setState({
-            isLiked:
-              Object.keys(this.props.user.data).length !== 0
-                ? this.state.news.post_like.findIndex(item => item.user_id === this.props.user.data.id) !== -1
-                : false,
-          });
-        },
-      );
-      if (Object.keys(this.props.user.data).length !== 0) {
-        const followRes = await getFollow();
+        });
+      }
+    });
+
+    if (Object.keys(this.props.user.data).length !== 0) {
+      getFollow().then((followRes) => {
         if (followRes.status === 200) {
           this.setState({
             follow:
-              followRes.data.findIndex(item => item.follow_to === res.data.crawl_frame.id) !== -1,
+              followRes.data.findIndex(item => item.follow_to === this.item.crawl_frame.id) !== -1,
           });
         }
-      }
-    } else {
-      Alert.alert('KHÔNG THÀNH CÔNG', 'Đã có lỗi xảy ra, bạn vui lòng thử lại sau');
+      });
     }
   };
 
@@ -251,7 +290,7 @@ class NewsDetail extends Component {
   };
 
   getTime = () => {
-    const createdAt = this.state.news.created_at;
+    const createdAt = this.item.created_at;
     const now = moment().format('YYYY-MM-DD HH:mm:ss');
     const duration = moment(now, 'YYYY-MM-DD HH:mm:ss').diff(createdAt, 'seconds');
     const minute = 3600;
@@ -265,6 +304,7 @@ class NewsDetail extends Component {
     }
     return `${moment(now, 'YYYY-MM-DD HH:mm:ss').diff(createdAt, 'days')} ngày`;
   };
+
   handleCapture = (e) => {
     const focusField = TextInputState.currentlyFocusedField();
     const { target } = e.nativeEvent;
@@ -335,8 +375,8 @@ class NewsDetail extends Component {
       fontVisible,
       fontContent,
       hotNews,
+      newsContent,
     } = this.state;
-    console.log(comment);
 
     const titleStyles = {
       p: [
@@ -348,7 +388,18 @@ class NewsDetail extends Component {
       ],
     };
     return (
-      <View style={{ flex: 1 }} onStartShouldSetResponderCapture={this.handleCapture}>
+      <View
+        style={{ flex: 1 }}
+        onStartShouldSetResponderCapture={this.handleCapture}
+        onTouchStart={(e) => {
+          this.start = e.nativeEvent.locationX;
+        }}
+        onTouchMove={(e) => {
+          if (e.nativeEvent.locationX - this.start > d.windowSize.width / 3) {
+            navigation.goBack();
+          }
+        }}
+      >
         <WhiteHeader
           leftHeader={
             <Icon
@@ -382,12 +433,12 @@ class NewsDetail extends Component {
                       },
                     ]}
                   >
-                    {news.crawl_frame.name} • {this.getTime()}
+                    {this.item.crawl_frame.name} • {this.getTime()}
                   </Text>
                 </View>
                 <TouchableOpacity
                   style={[styles.subscribe, { borderColor: follow ? '#BDBDBD' : '#C21E2B' }]}
-                  onPress={() => this.onFollow(news.crawl_frame.id)}
+                  onPress={this.onFollow}
                 >
                   <Text
                     style={{
@@ -405,231 +456,228 @@ class NewsDetail extends Component {
           rightHeader={<IconMaterial name="format-annotation-plus" size={30 * d.ratioW} />}
           onPressRightHeader={() => this.onOpenFontModal()}
         />
-        {loading ? (
-          <ActivityIndicator color="#C21E2B" size="large" />
-        ) : (
-          <View style={{ flex: 1 }}>
-            <KeyboardAwareScrollView
-              resetScrollToCoords={{ x: 0, y: 0 }}
-              contentContainerStyle={{ flex: 1 }}
-              scrollEnabled={false}
-            >
-              <View style={styles.contentContainer}>
-                <ScrollView
-                  style={styles.scrollview}
-                  keyboardShouldPersistTaps="always"
-                  onScroll={(e) => {
-                    if (e.nativeEvent.contentOffset.y > this.header) {
-                      if (!headerVisible) this.setState({ headerVisible: true });
-                    } else if (headerVisible) {
-                      this.setState({ headerVisible: false });
-                    }
-                  }}
-                  ref={(ref) => {
-                    this.scrollView = ref;
-                  }}
-                  scrollEventThrottle={100}
-                  showsVerticalScrollIndicator={false}
-                >
-                  <View style={styles.titleContainer}>
-                    <HTMLView value={`<p>${news.title}</p>`} stylesheet={titleStyles} />
-                    <View
-                      style={styles.avatarContainer}
-                      onLayout={(e) => {
-                        this.header = e.nativeEvent.layout.y + e.nativeEvent.layout.height;
-                      }}
-                    >
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Image
-                          source={{ uri: 'https://picsum.photos/30/30' }}
-                          style={styles.avatar}
-                        />
-                        <View>
-                          <Text
-                            style={[
-                              styles.userNameStyle,
-                              {
-                                fontSize: 16 * d.ratioW,
-                                fontFamily: Fonts.regular,
-                                marginTop: Platform.OS === 'ios' ? 5 * d.ratioH : null,
-                              },
-                            ]}
-                          >
-                            {news.crawl_frame.name} • {this.getTime()}
-                          </Text>
-                        </View>
-                      </View>
-                      <TouchableOpacity
-                        style={[styles.subscribe, { borderColor: follow ? '#BDBDBD' : '#C21E2B' }]}
-                        onPress={() => this.onFollow(news.crawl_frame.id)}
-                      >
-                        <Text
-                          style={{
-                            color: follow ? '#BDBDBD' : '#C21E2B',
-                            fontSize: 12 * d.ratioW,
-                            fontFamily: Fonts.regular,
-                          }}
-                        >
-                          {follow ? 'Đã theo dõi' : 'Theo dõi'}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <AutoHeightWebView html={news.content} fontSize={fontContent} />
-                  <View style={styles.likeShareContainer}>
-                    <View style={{ alignItems: 'center' }}>
-                      {this.likeAnimationView()}
-                      <TouchableOpacity
-                        style={[
-                          styles.likeContainer,
-                          { borderColor: isLiked ? '#C21E2B' : 'gray' },
-                        ]}
-                        onPress={this.onLike}
-                      >
-                        <Icons
-                          name="like"
-                          size={22 * d.ratioW}
-                          color={isLiked ? '#C21E2B' : 'gray'}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    <View style={{ width: 30 * d.ratioW }} />
-                    <TouchableOpacity style={styles.shareContainer} onPress={this.onShare}>
-                      <Icons name="social-facebook" size={22 * d.ratioW} color="gray" />
-                    </TouchableOpacity>
-                  </View>
-                  <View>
-                    <View style={styles.suggestionContainer}>
-                      <View style={styles.customLineStyle} />
-                      <View style={{ backgroundColor: '#fff', position: 'absolute' }}>
-                        <Text style={{ fontFamily: Fonts.regular, margin: 5 }}>Đề xuất hay</Text>
-                      </View>
-                    </View>
-                    <FlatList
-                      data={news.relate && news.relate[0].post !== null ? news.relate : hotNews}
-                      renderItem={({ item }) => {
-                        if (item.post && item.relationship_id) {
-                          return (
-                            <Suggestion
-                              item={item.post}
-                              onPress={() => this.onSuggestPress(item.post)}
-                            />
-                          );
-                        }
-                        return <Suggestion item={item} onPress={() => this.onSuggestPress(item)} />;
-                      }}
-                      keyExtractor={item => `${item.id}`}
-                      style={{ width: '100%' }}
-                    />
-                  </View>
-                  <View style={styles.suggestionContainer}>
-                    <View style={styles.customLineStyle} />
-                    <View style={{ backgroundColor: '#fff', position: 'absolute' }}>
-                      <Text style={{ fontFamily: Fonts.regular, margin: 5 }}>Bình luận</Text>
-                    </View>
-                  </View>
-                  {comment.length === 0 && (
-                    <View
-                      style={{ width: '100%', alignItems: 'center', marginBottom: 15 * d.ratioH }}
-                    >
-                      <Text style={{ fontFamily: Fonts.regular }}>Chưa có bình luận nào</Text>
-                    </View>
-                  )}
-                  <FlatList
+        <View style={{ flex: 1 }}>
+          <KeyboardAwareScrollView
+            resetScrollToCoords={{ x: 0, y: 0 }}
+            contentContainerStyle={{ flex: 1 }}
+            scrollEnabled={false}
+          >
+            <View style={styles.contentContainer}>
+              <ScrollView
+                style={styles.scrollview}
+                keyboardShouldPersistTaps="always"
+                onScroll={(e) => {
+                  if (e.nativeEvent.contentOffset.y > this.header) {
+                    if (!headerVisible) this.setState({ headerVisible: true });
+                  } else if (headerVisible) {
+                    this.setState({ headerVisible: false });
+                  }
+                }}
+                ref={(ref) => {
+                  this.scrollView = ref;
+                }}
+                scrollEventThrottle={100}
+                showsVerticalScrollIndicator={false}
+              >
+                <View style={styles.titleContainer}>
+                  <HTMLView value={`<p>${this.item.title}</p>`} stylesheet={titleStyles} />
+                  <View
+                    style={styles.avatarContainer}
                     onLayout={(e) => {
-                      this.commentLayout = e.nativeEvent.layout.y;
+                      this.header = e.nativeEvent.layout.y + e.nativeEvent.layout.height;
                     }}
-                    data={comment}
-                    renderItem={({ item }) => (
-                      <Comment
-                        block
-                        canDelete={item.user_id === user.data.id}
-                        comment={item}
-                        navigation={this.props.navigation}
-                        onPress={() => this.props.navigation.navigate('CommentDetail', { item })}
-                        onDelete={this.onDeleteComment}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Image
+                        source={{ uri: 'https://picsum.photos/30/30' }}
+                        style={styles.avatar}
                       />
-                    )}
-                    keyExtractor={item => item.id.toString()}
-                    style={{ marginBottom: 15 * d.ratioH }}
-                  />
-                </ScrollView>
-              </View>
-              <View style={styles.footerContainer}>
-                <View style={styles.comment}>
-                  <View style={styles.textInput}>
-                    <Icons
-                      name="pencil"
-                      size={18 * d.ratioW}
-                      color="gray"
-                      style={styles.commentInputTextIconStyle}
-                    />
-                    <TextInput
-                      ref={(ref) => {
-                        this._textInput = ref;
-                      }}
-                      value={content}
-                      onChangeText={value => this.setState({ content: value })}
-                      onBlur={() => {
-                        if (!content) this.setState({ write: false });
-                      }}
-                      underlineColorAndroid="transparent"
-                      style={{
-                        fontFamily: Fonts.regular,
-                        flex: 1,
-                        padding: 0,
-                        justifyContent: 'center',
-                      }}
-                      placeholder="Viết bình luận..."
-                      placeholderTextColor="gray"
-                      onFocus={() => this.setState({ write: true })}
-                      autoCorrect={false}
-                    />
-                  </View>
-                  {write ? (
-                    <TouchableOpacity style={styles.sentContainer} onPress={this.onComment}>
+                      <View>
+                        <Text
+                          style={[
+                            styles.userNameStyle,
+                            {
+                              fontSize: 16 * d.ratioW,
+                              fontFamily: Fonts.regular,
+                              marginTop: Platform.OS === 'ios' ? 5 * d.ratioH : null,
+                            },
+                          ]}
+                        >
+                          {this.item.crawl_frame.name} • {this.getTime()}
+                        </Text>
+                      </View>
+                    </View>
+                    <TouchableOpacity
+                      style={[styles.subscribe, { borderColor: follow ? '#BDBDBD' : '#C21E2B' }]}
+                      onPress={this.onFollow}
+                    >
                       <Text
                         style={{
-                          margin: 5,
-                          color: '#fff',
-                          fontSize: 14 * d.ratioW,
+                          color: follow ? '#BDBDBD' : '#C21E2B',
+                          fontSize: 12 * d.ratioW,
                           fontFamily: Fonts.regular,
                         }}
                       >
-                        Gửi
+                        {follow ? 'Đã theo dõi' : 'Theo dõi'}
                       </Text>
                     </TouchableOpacity>
-                  ) : (
-                    <View style={{ flexDirection: 'row' }}>
-                      <TouchableOpacity
-                        style={styles.commentContainer1}
-                        onPress={() => {
-                          this.scrollView.scrollTo({ x: 0, y: this.commentLayout, animated: true });
-                        }}
-                      >
-                        {comment.length > 0 && (
-                          <View style={styles.commentQuantity}>
-                            <Text style={styles.cmt}>{comment.length}</Text>
-                          </View>
-                        )}
-                        <Icons name="bubble" size={18} color="gray" />
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.commentContainer} onPress={this.onShare}>
-                        <Icons
-                          name="share-alt"
-                          size={18}
-                          color="gray"
-                          style={{ bottom: 1 * d.ratioH, marginRight: 5 * d.ratioW }}
-                        />
-                        <Text style={styles.itemText}>Chia sẻ</Text>
-                      </TouchableOpacity>
-                    </View>
-                  )}
+                  </View>
                 </View>
+                {/* {newsContent === '' ? (
+                  <Text style={styles.loadText}>Đang tải dữ liệu bài viết....</Text>
+                ) : ( */}
+                <AutoHeightWebView id={this.item.id} html={newsContent} fontSize={fontContent} />
+                {/* )} */}
+                <View style={styles.likeShareContainer}>
+                  <View style={{ alignItems: 'center' }}>
+                    {this.likeAnimationView()}
+                    <TouchableOpacity
+                      style={[styles.likeContainer, { borderColor: isLiked ? '#C21E2B' : 'gray' }]}
+                      onPress={this.onLike}
+                    >
+                      <Icons
+                        name="like"
+                        size={22 * d.ratioW}
+                        color={isLiked ? '#C21E2B' : 'gray'}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={{ width: 30 * d.ratioW }} />
+                  <TouchableOpacity style={styles.shareContainer} onPress={this.onShare}>
+                    <Icons name="social-facebook" size={22 * d.ratioW} color="gray" />
+                  </TouchableOpacity>
+                </View>
+                <View>
+                  <View style={styles.suggestionContainer}>
+                    <View style={styles.customLineStyle} />
+                    <View style={{ backgroundColor: '#fff', position: 'absolute' }}>
+                      <Text style={{ fontFamily: Fonts.regular, margin: 5 }}>Đề xuất hay</Text>
+                    </View>
+                  </View>
+                  <FlatList
+                    data={news.relate && news.relate[0].post !== null ? news.relate : hotNews}
+                    renderItem={({ item }) => {
+                      if (item.post && item.relationship_id) {
+                        return (
+                          <Suggestion
+                            item={item.post}
+                            onPress={() => this.onSuggestPress(item.post)}
+                          />
+                        );
+                      }
+                      return <Suggestion item={item} onPress={() => this.onSuggestPress(item)} />;
+                    }}
+                    keyExtractor={item => `${item.id}`}
+                    style={{ width: '100%' }}
+                  />
+                </View>
+                <View style={styles.suggestionContainer}>
+                  <View style={styles.customLineStyle} />
+                  <View style={{ backgroundColor: '#fff', position: 'absolute' }}>
+                    <Text style={{ fontFamily: Fonts.regular, margin: 5 }}>Bình luận</Text>
+                  </View>
+                </View>
+                {comment.length === 0 && (
+                  <View
+                    style={{ width: '100%', alignItems: 'center', marginBottom: 15 * d.ratioH }}
+                  >
+                    <Text style={{ fontFamily: Fonts.regular }}>Chưa có bình luận nào</Text>
+                  </View>
+                )}
+                <FlatList
+                  onLayout={(e) => {
+                    this.commentLayout = e.nativeEvent.layout.y;
+                  }}
+                  data={comment}
+                  renderItem={({ item }) => (
+                    <Comment
+                      block
+                      canDelete={item.user_id === user.data.id}
+                      comment={item}
+                      navigation={this.props.navigation}
+                      onPress={() => this.props.navigation.navigate('CommentDetail', { item })}
+                      onDelete={this.onDeleteComment}
+                    />
+                  )}
+                  keyExtractor={item => item.id.toString()}
+                  style={{ marginBottom: 15 * d.ratioH }}
+                />
+              </ScrollView>
+            </View>
+            <View style={styles.footerContainer}>
+              <View style={styles.comment}>
+                <View style={styles.textInput}>
+                  <Icons
+                    name="pencil"
+                    size={18 * d.ratioW}
+                    color="gray"
+                    style={styles.commentInputTextIconStyle}
+                  />
+                  <TextInput
+                    ref={(ref) => {
+                      this._textInput = ref;
+                    }}
+                    value={content}
+                    onChangeText={value => this.setState({ content: value })}
+                    onBlur={() => {
+                      if (!content) this.setState({ write: false });
+                    }}
+                    underlineColorAndroid="transparent"
+                    style={{
+                      fontFamily: Fonts.regular,
+                      flex: 1,
+                      padding: 0,
+                      justifyContent: 'center',
+                    }}
+                    placeholder="Viết bình luận..."
+                    placeholderTextColor="gray"
+                    onFocus={() => this.setState({ write: true })}
+                    autoCorrect={false}
+                  />
+                </View>
+                {write ? (
+                  <TouchableOpacity style={styles.sentContainer} onPress={this.onComment}>
+                    <Text
+                      style={{
+                        margin: 5,
+                        color: '#fff',
+                        fontSize: 14 * d.ratioW,
+                        fontFamily: Fonts.regular,
+                      }}
+                    >
+                      Gửi
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <View style={{ flexDirection: 'row' }}>
+                    <TouchableOpacity
+                      style={styles.commentContainer1}
+                      onPress={() => {
+                        this.scrollView.scrollTo({ x: 0, y: this.commentLayout, animated: true });
+                      }}
+                    >
+                      {comment.length > 0 && (
+                        <View style={styles.commentQuantity}>
+                          <Text style={styles.cmt}>{comment.length}</Text>
+                        </View>
+                      )}
+                      <Icons name="bubble" size={18} color="gray" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.commentContainer} onPress={this.onShare}>
+                      <Icons
+                        name="share-alt"
+                        size={18}
+                        color="gray"
+                        style={{ bottom: 1 * d.ratioH, marginRight: 5 * d.ratioW }}
+                      />
+                      <Text style={styles.itemText}>Chia sẻ</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
-            </KeyboardAwareScrollView>
-          </View>
-        )}
+            </View>
+          </KeyboardAwareScrollView>
+        </View>
         <ModalLogIn
           visible={visible}
           onRef={(ref) => {

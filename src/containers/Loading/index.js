@@ -14,7 +14,7 @@ import {
 } from '../../actions';
 import { Header } from '../../components';
 import { getWeatherApi, getCurrentWeatherApi } from '../../services';
-import { oauth, user } from '../../services/newsAPI';
+import { oauth, user, getCategories } from '../../services/newsAPI';
 import { StorageTypes } from '../../constants';
 import { getSuccessCategories } from '../../actions/category';
 
@@ -45,42 +45,49 @@ class Loading extends PureComponent {
       // get data
       // await this.onGetLevel();
 
-      await this.getStorage();
-
+      this.getStorage();
+      this.getWeather();
       const userStorage = JSON.parse(await AsyncStorage.getItem('user'));
-      const currentWeather = await getCurrentWeatherApi();
-      const weather = await getWeatherApi();
       // get Category
-
+      // const result = await getCategories();
+      // console.log('categories ', result);
       // save data to redux
       if (userStorage) {
         const userApi = await user();
         if (userApi.status === 200) {
-          await this.props.saveUserData(userApi.data);
+          AsyncStorage.setItem('user', JSON.stringify(userApi.data));
+          this.props.saveUserData(userApi.data);
         } else {
-          await this.props.saveUserData(userStorage);
+          this.props.saveUserData(userStorage);
         }
       }
-      await this.props.getCurrentWeatherData(currentWeather.data);
-      await this.props.getWeatherData(weather.data);
 
       // save data to async storage
-      await AsyncStorage.setItem('weather', JSON.stringify(weather.data));
+      // await AsyncStorage.setItem('weather', JSON.stringify(weather.data));
       // console.log(this.props.user);
-      await this.props.getFollowApi();
-      await this.props.getLevel();
-
+      this.props.getFollowApi();
+      this.props.getLevel();
       // if (this.props.user.data && this.props.weather) {
-      this.props.navigation.navigate('Drawer');
       // }
     } catch (error) {
       console.log(error);
-      // Alert.alert('LỖI', 'Đã có lỗi xảy ra. Bạn vui lòng thử lại.');
-      const weather = await AsyncStorage.getItem('weather');
-      if (!weather) {
-        await this.props.getWeatherData(JSON.parse(weather));
-      }
+      Alert.alert('LỖI', 'Đã có lỗi xảy ra. Bạn vui lòng thử lại.');
+      // const weather = await AsyncStorage.getItem('weather');
+      // if (!weather) {
+      //   await this.props.getWeatherData(JSON.parse(weather));
+      // }
     }
+  };
+  getWeather = () => {
+    getCurrentWeatherApi()
+      .then((res) => {
+        this.props.getCurrentWeatherData(res.data);
+        return getWeatherApi();
+      })
+      .then((res) => {
+        this.props.getWeatherData(res.data);
+        this.props.navigation.navigate('Drawer');
+      });
   };
   getStorage = async () => {
     const result = await AsyncStorage.getItem(StorageTypes.CATEGORIES);

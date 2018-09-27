@@ -58,8 +58,9 @@ const styles = ScaledSheet.create({
     fontFamily: Fonts.regular,
   },
   thumbnailStyle: {
-    width: '100%',
-    height: d.windowSize.height,
+    width: '95%',
+    height: (d.windowSize.width - d.windowSize.width * 0.06) * 0.75,
+    alignSelf: 'center',
   },
   titleStyle: {
     fontFamily: Fonts.regular,

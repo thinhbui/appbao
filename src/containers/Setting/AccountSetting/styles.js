@@ -9,14 +9,14 @@ const styles = ScaledSheet.create({
     borderBottomWidth: 0.5,
     borderColor: 'rgba(0,0,0,0.1)',
     marginTop: 10 * d.ratioH,
-    backgroundColor: '#FFF',
+    backgroundColor: 'transparent',
   },
   buttonContainer: {
     paddingVertical: 13 * d.ratioH,
     borderBottomWidth: 0.5,
-    borderColor: 'rgba(0,0,0,0.1)',
+    borderColor: '#BDBDBD',
     justifyContent: 'space-between',
-    backgroundColor: '#FFF',
+    backgroundColor: 'transparent',
     flexDirection: 'row',
   },
   buttonNameStyle: {

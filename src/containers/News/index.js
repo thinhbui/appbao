@@ -27,6 +27,8 @@ import styles from './styles';
 import { Fonts } from '../../constants';
 import { getFollowApi } from '../../actions';
 
+const ITEM_HEIGHT = d.windowSize.height * 0.245 + 50 * d.ratioH;
+
 class News extends PureComponent {
   constructor(props) {
     super(props);
@@ -127,7 +129,8 @@ class News extends PureComponent {
                 onReport={() => this.onOpenModalReport(item.title, item.image, item.id)}
               />
             )}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.id.toString()}
+            getItemLayout={this.getItemLayout}
             refreshing={this.state.refreshing}
             refreshControl={
               <RefreshControl
@@ -152,6 +155,9 @@ class News extends PureComponent {
       </View>
     );
   };
+
+  getItemLayout = (data, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index });
+
   getAds = async () => {
     const result = await getAds();
     if (result.status === 200) {
@@ -286,6 +292,8 @@ class News extends PureComponent {
 
   loadMore = () => {
     const { page, refreshing, data } = this.state;
+    console.log('loadMore');
+
     if (!refreshing && this.onEndReachedCalledDuringMomentum) {
       this.setState({ refreshing: true });
       getNewsByCategory(this.props.item.id, page + 1, this.props.user.data.id)
@@ -371,7 +379,7 @@ class News extends PureComponent {
             data={data}
             extraData={this.state}
             renderItem={this.renderItem}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(item, index) => `${item.id}${index}`}
             refreshing={refreshing}
             refreshControl={
               <RefreshControl
@@ -381,8 +389,9 @@ class News extends PureComponent {
                 onRefresh={this.getNews}
               />
             }
+            getItemLayout={this.getItemLayout}
             onEndReached={this.loadMore}
-            onEndReachedThreshold={0.2}
+            onEndReachedThreshold={0.3}
             onMomentumScrollBegin={() => {
               this.onEndReachedCalledDuringMomentum = true;
             }}

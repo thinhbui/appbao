@@ -1,6 +1,9 @@
-import React, { Component } from 'react';
-import { WebView, View, Platform } from 'react-native';
+import React, { PureComponent } from 'react';
+import { WebView, View, Platform, Text } from 'react-native';
+import { debounce } from 'lodash';
 import { Fonts } from '../../constants';
+import { getContentNews } from '../../services/newsAPI';
+import styles from './styles';
 
 const script = `
 <script>
@@ -19,20 +22,29 @@ const script = `
         updateHeight();
         window.addEventListener("load", function() {
             updateHeight();
-            setTimeout(updateHeight, 1000);
+            setTimeout(updateHeight, 500);
         });
         window.addEventListener("resize", updateHeight);
         }());
 </script>
 `;
 
-class AutoHeightWebView extends Component {
+class AutoHeightWebView extends PureComponent {
   constructor(props) {
     super(props);
 
     this.state = {
+      newsContent: '',
       Height: '100%',
     };
+    // this.onNavigationChange = debounce(this.onNavigationChange, 1000);
+  }
+  componentDidMount() {
+    getContentNews(this.props.id).then((res) => {
+      console.log('getContentNews', res);
+
+      this.setState({ newsContent: res.data.content });
+    });
   }
   onNavigationChange = (event) => {
     if (event.title) {
@@ -41,7 +53,10 @@ class AutoHeightWebView extends Component {
     }
   };
   render() {
+    const { newsContent } = this.state;
     const { html, fontSize } = this.props;
+    console.log('webview');
+
     const style = `
         <style>
         @font-face {
@@ -124,17 +139,21 @@ class AutoHeightWebView extends Component {
         `;
     return (
       <View style={{ height: this.state.Height }}>
-        <WebView
-          scrollEnabled={false}
-          source={{ html: `<div class="clone-content"> ${html + style + script} </div>` }}
-          style={{ height: this.state.Height }}
-          javaScriptEnabled
-          onNavigationStateChange={this.onNavigationChange}
-          automaticallyAdjustContentInsets
-          mixedContentMode="always"
-          showsVerticalScrollIndicator={false}
-          scalesPageToFit={Platform.OS === 'android'}
-        />
+        {newsContent === '' ? (
+          <Text style={styles.loadText}>Đang tải dữ liệu bài viết....</Text>
+        ) : (
+          <WebView
+            scrollEnabled={false}
+            source={{ html: `<div class="clone-content"> ${newsContent + style + script} </div>` }}
+            style={{ height: this.state.Height }}
+            javaScriptEnabled
+            onNavigationStateChange={this.onNavigationChange}
+            automaticallyAdjustContentInsets
+            mixedContentMode="always"
+            showsVerticalScrollIndicator={false}
+            scalesPageToFit={Platform.OS === 'android'}
+          />
+        )}
       </View>
     );
   }

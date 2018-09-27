@@ -14,6 +14,13 @@ const styles = ScaledSheet.create({
     fontWeight: 'bold',
     fontFamily: Fonts.regular,
   },
+  loadText: {
+    textAlign: 'center',
+    fontSize: 14 * d.ratioW,
+    fontFamily: Fonts.regular,
+    color: '#000',
+    height: d.windowSize.height,
+  },
   avatarContainer: {
     paddingVertical: 5 * d.ratioH,
     flexDirection: 'row',
@@ -78,6 +85,7 @@ const styles = ScaledSheet.create({
     flexDirection: 'row',
     height: 50 * d.ratioH,
     marginRight: 20 * d.ratioW,
+    paddingHorizontal: 5 * d.ratioW,
   },
   commentQuantity: {
     position: 'absolute',
@@ -87,7 +95,7 @@ const styles = ScaledSheet.create({
     borderRadius: 8 * d.ratioW,
     backgroundColor: '#C21E2B',
     top: 12 * d.ratioH,
-    left: d.ratioW * 8,
+    left: d.ratioW * 12,
     zIndex: 100,
     elevation: 100,
     justifyContent: 'center',

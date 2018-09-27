@@ -132,7 +132,7 @@ class Search extends Component {
             data={data}
             extraData={this.state}
             renderItem={this._renderItem}
-            keyExtractor={(item) => index.id}
+            keyExtractor={(item) => item._id}
           />
           {searched &&
             data.length === 0 && (

@@ -67,7 +67,7 @@ class TabViewExample extends React.Component {
   onSearch = () => {
     this.props.navigation.navigate('Search');
   };
-  
+
   getItemLayout = (data, index) => ({
     length: this.widthTab[index - 1],
     offset: this.widthTab[index - 1] * index,
@@ -104,7 +104,9 @@ class TabViewExample extends React.Component {
     });
     return sceneMap;
   };
-  renderPager = props => <PagerPan {...props} />;
+  renderPager = props => (
+    <PagerPan {...props} initialLayout={{ width: d.windowSize.width, height: '100%' }} />
+  );
   renderScene = ({ route }) => (
     <News
       item={route}

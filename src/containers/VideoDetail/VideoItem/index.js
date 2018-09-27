@@ -16,9 +16,16 @@ class VideoItem extends PureComponent {
     super(props);
     this.state = {
       init: false,
+      isFocus: props.isFocus,
     };
   }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.isFocus !== this.props.isFocus) {
+      console.log('componentWillReceiveProps', nextProps);
 
+      this.setState({ isFocus: nextProps.isFocus });
+    }
+  }
   getTime = (item) => {
     const createdAt = item.created_at;
     const now = moment().format('YYYY-MM-DD HH:mm:ss');
@@ -36,22 +43,33 @@ class VideoItem extends PureComponent {
   };
 
   render() {
-    const { item, isFocus } = this.props;
-    const { init } = this.state;
+    const { item, onPlay, index } = this.props;
+    const { init, isFocus } = this.state;
     return (
       <View style={{ height: d.windowSize.height * 0.6 }}>
         {!isFocus && (
-          <Icon
-            name="play"
-            size={35}
-            color="#FFF"
+          <TouchableOpacity
             style={{
+              zIndex: 10000,
               position: 'absolute',
               alignSelf: 'center',
               marginTop: HEIGHT / 2,
               elevation: 1,
             }}
-          />
+            onPress={() => {
+              onPlay(index);
+              // this.setState({ isFocus: true });
+            }}
+          >
+            <Icon
+              name="play"
+              size={35}
+              color="#FFF"
+              // style={{
+
+              // }}
+            />
+          </TouchableOpacity>
         )}
         {isFocus || init ? (
           <View>
@@ -96,7 +114,10 @@ class VideoItem extends PureComponent {
             onPress={() => this.props.navigation.navigate('CommentVideo', { item })}
           >
             <View style={styles.commentPartContainer}>
-              <Image source={{ uri: this.props.user.data.avatar }} style={styles.avatarStyle} />
+              <Image
+                source={{ uri: this.props.user.data.avatar || 'https://picsum.photos/200/200' }}
+                style={styles.avatarStyle}
+              />
               <Text style={styles.commentTextStyle}>Nhập bình luận...</Text>
             </View>
             <View style={styles.commentPartContainer}>

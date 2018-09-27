@@ -11,6 +11,8 @@ const K_TO_C = 274.15;
 class Weather extends PureComponent {
   render() {
     const currentTemp = this.props.currentWeather.data.main.temp;
+    console.log(this.props.weather);
+
     const tempRange = this.props.weather.data.list[0].main;
     return (
       <View style={styles.weatherContainer}>

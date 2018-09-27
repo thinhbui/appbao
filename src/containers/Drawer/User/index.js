@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { Icons, Fonts } from '../../../constants';
 import styles from './styles';
 import * as d from '../../../utilities/transform';
-import { level } from '../../../services/newsAPI';
+import { updateLevel } from '../../../services/newsAPI';
 
 const avatar = 'https://picsum.photos/200/200';
 
@@ -29,9 +29,11 @@ class User extends PureComponent {
     }
   }
 
-  onRenderLevel = () => {
+  onRenderLevel = async () => {
     const { level, user } = this.props;
     const index = level.data.findIndex(e => user.data.point === e.exp);
+    const result = await updateLevel();
+    console.log('Update level ', result);
     if (index !== -1) {
       this.setState({ level: level.data[index].id, levelName: level.data[index].name });
     } else {

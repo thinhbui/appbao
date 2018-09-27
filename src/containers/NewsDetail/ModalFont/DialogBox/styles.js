@@ -1,5 +1,6 @@
 import { ScaledSheet } from 'react-native-size-matters';
 import * as d from '../../../../utilities/transform';
+import { isGalaxy } from '../../../../utilities/device';
 
 const styles = ScaledSheet.create({
   container: {
@@ -10,7 +11,7 @@ const styles = ScaledSheet.create({
     height: d.windowSize.height,
     width: d.windowSize.width,
     flexDirection: 'row',
-    // alignItems: 'flex-end',
+    alignItems: 'flex-end',
     // paddingBottom: 15 * d.ratioH,
   },
   overlayStyle: {
@@ -21,9 +22,9 @@ const styles = ScaledSheet.create({
   },
   dialogStyle: {
     backgroundColor: '#FFF',
-    height: 150 * d.ratioH,
-    marginTop: d.windowSize.height - 150 * d.ratioH,
-    position: 'absolute',
+    height: isGalaxy() ? 120 * d.ratioH : 150 * d.ratioH,
+    // marginTop: d.windowSize.height - 150 * d.ratioH,
+    // position: 'absolute',
     paddingTop: 15 * d.ratioH,
     alignItems: 'center',
     width: '100%',

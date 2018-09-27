@@ -11,7 +11,7 @@ const getCategory = () => async (dispatch) => {
     const categories = [
       // { id: 1, name: 'Đề xuất', slug: 'de-xuat' },
       { id: 123, name: 'Theo dõi', slug: 'theo-doi' },
-      ...result.data.slice(0, 10),
+      ...result.data.filter(item => item.parent_id === null),
     ];
     const suggests = [];
     AsyncStorage.setItem(StorageTypes.CATEGORIES, JSON.stringify({ categories, suggests }));

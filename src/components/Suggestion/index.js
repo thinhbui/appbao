@@ -70,7 +70,7 @@ const Suggestion = ({
             position: 'absolute',
             alignSelf: 'flex-start',
             bottom: 8 * d.ratioH,
-            right: 15 * d.ratioW,
+            right: 20 * d.ratioW,
           }}
         >
           <Icon name="x-square" size={12 * d.ratioW} color="#BDBDBD" style={{ margin: 5 }} />

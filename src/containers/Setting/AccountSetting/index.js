@@ -38,7 +38,7 @@ class AccountSetting extends PureComponent {
     if (this.state.onEdit) {
       return (
         <TextInput
-          placeholder={detail}
+          placeholder={detail || ''}
           style={{
             paddingVertical: Platform.OS === 'ios' ? null : d.windowSize.height * -0.1,
             width: d.windowSize.width * 0.7,
@@ -49,7 +49,7 @@ class AccountSetting extends PureComponent {
         />
       );
     }
-    return <Text style={styles.buttonDescriptionStyle}>{detail}</Text>;
+    return <Text style={styles.buttonDescriptionStyle}>{detail || ''}</Text>;
   };
 
   onCancel = () => {
@@ -64,44 +64,52 @@ class AccountSetting extends PureComponent {
     const { navigation, user } = this.props;
     const { onEdit } = this.state;
     return (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={{ flex: 1 }}>
-          <WhiteHeader
-            leftHeader={
-              <Icon
-                name={onEdit ? 'ios-close' : 'ios-arrow-back'}
-                size={35 * d.ratioW}
-                color={onEdit ? '#C21E2B' : '#757575'}
-              />
-            }
-            centerHeader="Sửa đổi thông tin"
-            rightHeader={
-              <Text
-                style={{ fontFamily: Fonts.regular, color: '#C21E2B', fontSize: 17 * d.ratioW }}
-              >
-                {onEdit ? 'Lưu' : 'Sửa'}
-              </Text>
-            }
-            onPressLeftHeader={this.onCancel}
-            onPressRightHeader={this.onEditProfile}
-          />
-          <TouchableOpacity style={styles.avatarContainer}>
-            <Image source={{ uri: user.data.avatar || avatar }} style={styles.avatarStyle} />
-          </TouchableOpacity>
-          <ScrollView>
-            <View style={styles.container}>
-              <TouchableOpacity style={styles.buttonContainer}>
-                <Text style={styles.buttonNameStyle}>Nickname</Text>
-                {this.onRenderDetail(user.data.full_name)}
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.buttonContainer}>
-                <Text style={styles.buttonNameStyle}>Email</Text>
-                {this.onRenderDetail(user.data.email)}
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-        </View>
-      </TouchableWithoutFeedback>
+      <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+        <WhiteHeader
+          leftHeader={
+            <Icon
+              name={onEdit ? 'ios-close' : 'ios-arrow-back'}
+              size={35 * d.ratioW}
+              color={onEdit ? '#C21E2B' : '#757575'}
+            />
+          }
+          centerHeader={
+            <Text style={{ fontFamily: Fonts.regular, color: '#000', fontSize: 18 * d.ratioW }}>
+              Sửa đổi thông tin
+            </Text>
+          }
+          rightHeader={
+            <Text style={{ fontFamily: Fonts.regular, color: '#C21E2B', fontSize: 16 * d.ratioW }}>
+              {onEdit ? 'Lưu' : 'Sửa'}
+            </Text>
+          }
+          onPressLeftHeader={this.onCancel}
+          onPressRightHeader={this.onEditProfile}
+        />
+        <TouchableOpacity style={styles.avatarContainer}>
+          <Image source={{ uri: user.data.avatar || avatar }} style={styles.avatarStyle} />
+        </TouchableOpacity>
+        <ScrollView>
+          <View style={styles.container}>
+            <TouchableOpacity style={styles.buttonContainer}>
+              <Text style={styles.buttonNameStyle}>Họ và tên</Text>
+              {this.onRenderDetail(user.data.full_name)}
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonContainer}>
+              <Text style={styles.buttonNameStyle}>Email</Text>
+              {this.onRenderDetail(user.data.email)}
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonContainer}>
+              <Text style={styles.buttonNameStyle}>Số điện thoại</Text>
+              {this.onRenderDetail(user.data.phone_number)}
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonContainer}>
+              <Text style={styles.buttonNameStyle}>Sở thích</Text>
+              {this.onRenderDetail()}
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
     );
   }
 }

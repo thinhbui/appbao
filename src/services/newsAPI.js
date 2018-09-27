@@ -68,7 +68,7 @@ const oauth = async () => {
         lightService.defaults.headers.Authorization = tokenStorage.accessToken;
       }
     } else {
-      const resultWeather = await axios.get('https://api.openweathermap.org/data/2.5/forecast?lat=21.025849&lon=105.800397&appid=cb9867d86274c8d87e60b42395ef27fd');
+      // axios.get('https://api.openweathermap.org/data/2.5/forecast?lat=21.025849&lon=105.800397&appid=cb9867d86274c8d87e60b42395ef27fd');
       const result = await axios.post(OAUTH, {
         client_id: 6,
         client_secret: 'TSX321PeG4lE0vILIU0Rw03lV6tRFjM8Q99hRdbI',
@@ -79,16 +79,18 @@ const oauth = async () => {
       }`;
     }
   } catch (error) {
-    // const tokenObject = {
-    //   accessToken: tokenDefault,
-    //   expireDate: moment()
-    //     .add(1296000, 'seconds')
-    //     .format('DD/MM/YYYY HH:mm:ss'),
-    //   refreshToken: 'refresh_token',
-    // };
-    // AsyncStorage.setItem('token', JSON.stringify(tokenObject));
-    // lightService.defaults.headers.Authorization = tokenDefault;
-    console.log('OAUTH ', error);
+    axios.get('https://api.openweathermap.org/data/2.5/forecast?lat=21.025849&lon=105.800397&appid=cb9867d86274c8d87e60b42395ef27fd');
+    const result = await axios.post(OAUTH, {
+      client_id: 6,
+      client_secret: 'TSX321PeG4lE0vILIU0Rw03lV6tRFjM8Q99hRdbI',
+      grant_type: 'client_credentials',
+    });
+    if (result.status === 200) {
+      lightService.defaults.headers.Authorization = `${result.data.token_type} ${
+        result.data.access_token
+      }`;
+    }
+    console.log(error);
   }
 };
 
@@ -151,7 +153,7 @@ const getNewsByCategory = async (category_id, page, user_report) => {
 const getVideos = async () => {
   try {
     // console.log(page);
-    return await lightService.get(`/v1/post/client/video?page_size=15`);
+    return await lightService.get('/v1/post/client/video?page_size=15');
   } catch (error) {
     console.log('getVideos', error);
     return null;
@@ -344,8 +346,31 @@ const getSource = async () => {
   }
 };
 
-const logout = () => {
-  lightService.defaults.headers.Authorization = tokenDefault;
+const updateLevel = async () => {
+  try {
+    return await lightService.get('v1/user/level');
+  } catch (error) {
+    return null;
+  }
+};
+
+const logout = async () => {
+  axios.get('https://api.openweathermap.org/data/2.5/forecast?lat=21.025849&lon=105.800397&appid=cb9867d86274c8d87e60b42395ef27fd');
+  const result = await axios.post(OAUTH, {
+    client_id: 6,
+    client_secret: 'TSX321PeG4lE0vILIU0Rw03lV6tRFjM8Q99hRdbI',
+    grant_type: 'client_credentials',
+  });
+  lightService.defaults.headers.Authorization = `${result.data.token_type} ${
+    result.data.access_token
+  }`;
+};
+const getContentNews = async (id) => {
+  try {
+    return await lightService.get(`v1/posts/cache/${id}`);
+  } catch (error) {
+    return null;
+  }
 };
 
 export {
@@ -377,4 +402,6 @@ export {
   getFrame,
   getHotNews,
   getSource,
+  updateLevel,
+  getContentNews,
 };
